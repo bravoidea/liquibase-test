@@ -1,22 +1,21 @@
 dev:
-    de-shared-postgresql-dev:
-        db_instance: secret_name
-        databases:
-        - name: database_name
-        - name: database_name
-        apps:
-        - name : app_name
-          secret: secret_name
-        - name : app_name
-          secret: secret_name
-    it-rds-psql-dev:
-        db_instance: secret_name
-        databases:
-        - name: database_name
-        - name: database_name
-        apps:
-        - name : app_name
-          secret: secret_name
-        - name : app_name
-          secret: secret_name
-
+    - name: de-shared-postgresql-dev
+      db_instance: secret_name
+      databases:
+      - name: database_name
+      - name: database_name
+      apps:
+      - name : app_name
+        secret: secret_name
+      - name : app_name
+        secret: secret_name
+    - name: it-rds-psql-dev
+      db_instance: secret_name
+      databases:
+      - name: database_name
+      - name: database_name
+      apps:
+      - name : app_name
+        secret: secret_name
+      - name : app_name
+        secret: secret_name

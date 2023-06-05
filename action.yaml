@@ -1,0 +1,63 @@
+name: Deploy to Dev
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch: {}
+
+env:
+  ENVIRONMENT: dev
+
+jobs:
+  # Load env vars and other preliminary stuff
+  init:
+    name: Init
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check branch
+        if: env.ENVIRONMENT == 'prod' && github.ref != 'refs/heads/master'
+        run: |
+          echo "This workflow can only be used on the master branch."
+          exit 1
+      # Checkout repo
+      - uses: actions/checkout@v2
+      # Checkout private cfacorp actions lib
+      - name: Run read-yaml config
+        id: yaml-data
+        uses: jbutcher5/read-yaml@main      # You may wish to replace main with a version tag such as '1.6' etc.
+        with:
+          file: './config.yaml'          # File to read from
+          key-path: '[ "${{ env.ENVIRONMENT }}" ]'
+        outputs:
+          db_name: ${{ fromJson(steps.yaml-data.outputs.data)[0].databases.*.name }}
+          #db_name: [1,2]
+  example_matrix:
+    needs: init
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        database: [ 1,2,3 ]
+      max-parallel: 1
+        #database: "${{ needs.yaml-data.outputs.db_name }}"
+    steps:
+      - name: print details
+        run:
+          echo "__________ ${{ matrix.database }}"
+
+
+      
+      # - name: Get Secrets by Name and by ARN
+      #   uses: aws-actions/aws-secretsmanager-get-secrets@v1
+      #   with:
+      #   secret-ids: |
+      #       ${{ fromJson(steps.yaml-data.outputs.data)[0].apps.*.secret[0] }}
+      #       ${{ fromJson(steps.yaml-data.outputs.data)[0].apps.*.secret[1] }}
+      #       parse-json-secrets: true
+      # - name: Display read-yaml output
+      #   run: | 
+      #     db=`echo ${{ join(fromJson(steps.yaml-data.outputs.data)[0].databases.*.name,',') }}`
+      #     secret=`echo ${{ fromJson(steps.yaml-data.outputs.data)[0].apps.*.secret[0] }}`
+      #     echo "${secret}"
+      
+
+          
